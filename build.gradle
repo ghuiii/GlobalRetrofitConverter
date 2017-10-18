@@ -1,18 +1,128 @@
-group 'me.ghui'
-version '1.0-SNAPSHOT'
-
 apply plugin: 'java'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven-publish'
 
-sourceCompatibility = 1.8
+sourceCompatibility = "1.7"
+targetCompatibility = "1.7"
 
-repositories {
-    jcenter()
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+    }
 }
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile 'com.squareup.retrofit2:retrofit:2.3.0'
     testCompile 'com.squareup.retrofit2:converter-gson:2.3.0'
     testCompile 'me.ghui:Fruit:1.0.4'
     testCompile 'me.ghui:fruit-converter-retrofit:1.0.4'
+    testCompile 'org.assertj:assertj-core:3.8.0'
+    testCompile 'com.squareup.okhttp3:mockwebserver:3.9.0'
+
+    compile 'com.squareup.retrofit2:retrofit:2.3.0'
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+ext {
+    libVersion = '1.0.0'
+    libName = 'global-retrofit-converter'
+    libUrl = 'https://github.com/ghuiii/GlobalRetrofitConverter'
+    desc = "A global retrofit converter which can wrapper other converters"
+    license = "Apache-2.0"
+}
+
+// Create the pom configuration:
+def pomConfig = {
+    licenses {
+        license {
+            name "$license"
+            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+        }
+    }
+    developers {
+        developer {
+            id "ghui"
+            name "ghui"
+            email "ghuiii.zhang@gmail.com"
+        }
+    }
+
+    scm {
+        url "$libUrl"
+    }
+}
+
+publishing {
+    publications {
+        MyPublication(MavenPublication) {
+            from components.java
+            Artifact sourcesJar
+            Artifact javadocJar
+            groupId 'me.ghui'
+            artifactId "$libName"
+            version "$libVersion"
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', "$desc")
+                root.appendNode('name', "$libName")
+                root.appendNode('url', "$libUrl")
+                root.children().last() + pomConfig
+            }
+        }
+    }
+
+}
+
+bintray {
+    user = project.hasProperty('bintray_user') ? bintray_user : ''
+    key = project.hasProperty('bintray_key') ? bintray_key : ''
+    println("user: " + user + ", key: " + key)
+    publications = ['MyPublication']
+    pkg {
+        repo = 'Java'
+        name = "$libName"
+        licenses = ["$license"]
+        vcsUrl = "$libUrl"
+        version {
+            name = "$libVersion"
+            desc = "$desc"
+            released = new Date()
+            vcsTag = "$libVersion"
+
+            gpg {
+                sign = true //Determines whether to GPG sign the files. The default is false
+            }
+            mavenCentralSync {
+                sync = true //[Default: true] Determines whether to sync the version to Maven Central.
+                user = project.hasProperty('oss_user') ? project.oss_user : ''
+                password = project.hasProperty('oss_psw') ? project.oss_psw : ''
+                println("oss_user: " + user + ", oss_psw: " + password)
+                close = '1' //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
+            }
+        }
+    }
 }
