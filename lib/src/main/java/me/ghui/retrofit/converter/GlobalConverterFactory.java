@@ -16,19 +16,33 @@ import java.util.HashMap;
 
 public class GlobalConverterFactory extends Converter.Factory {
 
-	private HashMap<Class<? extends Annotation>, Converter.Factory> mFactoryClassHashMap = new HashMap<>();
+	private HashMap<Class<? extends Annotation>, Converter.Factory> mFactoryClassHashMap;
 
 	public static GlobalConverterFactory create() {
 		return new GlobalConverterFactory();
 	}
 
+	private Converter.Factory mDefaultFactory;
+
 	private GlobalConverterFactory() {
 	}
 
+	/**
+	 * Add a converter factory associated with the clazz Annotation, the first added one will be as the default factory.
+	 * @param factory factory of converter
+	 * @param clazz the annotion class
+	 * @return this
+	 */
 	public GlobalConverterFactory add(Converter.Factory factory, Class<? extends Annotation> clazz) {
-		if (factory != null && clazz == null) {
-			throw new NullPointerException("Converter.Factory or Class cannot be null");
+		if (factory == null || clazz == null) {
+			throw new IllegalArgumentException("Converter.Factory and Class cannot be null");
 		}
+
+		if (mFactoryClassHashMap == null) {
+			mFactoryClassHashMap = new HashMap<>();
+			mDefaultFactory = factory;
+		}
+
 		mFactoryClassHashMap.put(clazz, factory);
 		return this;
 	}
@@ -39,6 +53,8 @@ public class GlobalConverterFactory extends Converter.Factory {
 			Converter.Factory factory = mFactoryClassHashMap.get(annotation.annotationType());
 			if (factory != null) {
 				return factory.responseBodyConverter(type, annotations, retrofit);
+			}else {
+				return mDefaultFactory.responseBodyConverter(type, annotations, retrofit);
 			}
 		}
 		return null;

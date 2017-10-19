@@ -22,10 +22,12 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class GlobalConverterTest {
     interface Service {
         @Html
-        @GET("/html") Call<FruitInfo> fruitInfo();
+        @GET("/html") Call<FruitInfo> fruitInfoFromHtml();
 
         @Json
-        @GET("/json") Call<PersonInfo> personInfo();
+        @GET("/json") Call<PersonInfo> personInfoFromJson();
+
+        @GET("/json") Call<PersonInfo> personInfoFromJson2();
     }
 
     @Rule
@@ -73,7 +75,7 @@ public class GlobalConverterTest {
                         "</body>\n" +
                         "\n" +
                         "</html>"));
-        Call<FruitInfo> call = service.fruitInfo();
+        Call<FruitInfo> call = service.fruitInfoFromHtml();
         Response<FruitInfo> responseInfo = call.execute();
         FruitInfo fruitInfo = responseInfo.body();
         assertThat(fruitInfo.getTitle()).isEqualTo("Ghui's favorite Fruits");
@@ -95,7 +97,24 @@ public class GlobalConverterTest {
                 "    \"blog\" : \"ghui.me\"\n" +
                 "}";
         server.enqueue(new MockResponse().setBody(json));
-        Call<PersonInfo> call = service.personInfo();
+        Call<PersonInfo> call = service.personInfoFromJson();
+        PersonInfo personInfo = call.execute().body();
+
+        assertThat(personInfo).isNotNull();
+        assertThat(personInfo.getName()).isEqualTo("ghui");
+        assertThat(personInfo.getBio()).contains("good");
+        assertThat(personInfo.getBlog()).isEqualTo("ghui.me");
+    }
+
+    @Test
+    public void testDefaultConverter() throws IOException {
+        String json = "{\n" +
+                "    \"name\" : \"ghui\",\n" +
+                "    \"bio\" : \"A good man\",\n" +
+                "    \"blog\" : \"ghui.me\"\n" +
+                "}";
+        server.enqueue(new MockResponse().setBody(json));
+        Call<PersonInfo> call = service.personInfoFromJson2();
         PersonInfo personInfo = call.execute().body();
 
         assertThat(personInfo).isNotNull();
