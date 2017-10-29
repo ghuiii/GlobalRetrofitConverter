@@ -22,7 +22,6 @@ public class GlobalConverterFactory extends Converter.Factory {
 		return new GlobalConverterFactory();
 	}
 
-	private Converter.Factory mDefaultFactory;
 
 	private GlobalConverterFactory() {
 	}
@@ -40,7 +39,6 @@ public class GlobalConverterFactory extends Converter.Factory {
 
 		if (mFactoryClassHashMap == null) {
 			mFactoryClassHashMap = new HashMap<>();
-			mDefaultFactory = factory;
 		}
 
 		mFactoryClassHashMap.put(clazz, factory);
@@ -53,8 +51,6 @@ public class GlobalConverterFactory extends Converter.Factory {
 			Converter.Factory factory = mFactoryClassHashMap.get(annotation.annotationType());
 			if (factory != null) {
 				return factory.responseBodyConverter(type, annotations, retrofit);
-			}else {
-				return mDefaultFactory.responseBodyConverter(type, annotations, retrofit);
 			}
 		}
 		return null;

@@ -27,7 +27,7 @@ public class GlobalConverterTest {
         @Json
         @GET("/json") Call<PersonInfo> personInfoFromJson();
 
-        @GET("/json") Call<PersonInfo> personInfoFromJson2();
+//        @GET("/json") Call<PersonInfo> personInfoFromJson2();
     }
 
     @Rule
@@ -106,21 +106,21 @@ public class GlobalConverterTest {
         assertThat(personInfo.getBlog()).isEqualTo("ghui.me");
     }
 
-    @Test
-    public void testDefaultConverter() throws IOException {
-        String json = "{\n" +
-                "    \"name\" : \"ghui\",\n" +
-                "    \"bio\" : \"A good man\",\n" +
-                "    \"blog\" : \"ghui.me\"\n" +
-                "}";
-        server.enqueue(new MockResponse().setBody(json));
-        Call<PersonInfo> call = service.personInfoFromJson2();
-        PersonInfo personInfo = call.execute().body();
-
-        assertThat(personInfo).isNotNull();
-        assertThat(personInfo.getName()).isEqualTo("ghui");
-        assertThat(personInfo.getBio()).contains("good");
-        assertThat(personInfo.getBlog()).isEqualTo("ghui.me");
-    }
+//    @Test
+//    public void testDefaultConverter() throws IOException {
+//        String json = "{\n" +
+//                "    \"name\" : \"ghui\",\n" +
+//                "    \"bio\" : \"A good man\",\n" +
+//                "    \"blog\" : \"ghui.me\"\n" +
+//                "}";
+//        server.enqueue(new MockResponse().setBody(json));
+//        Call<PersonInfo> call = service.personInfoFromJson2();
+//        PersonInfo personInfo = call.execute().body();
+//
+//        assertThat(personInfo).isNotNull();
+//        assertThat(personInfo.getName()).isEqualTo("ghui");
+//        assertThat(personInfo.getBio()).contains("good");
+//        assertThat(personInfo.getBlog()).isEqualTo("ghui.me");
+//    }
 
 }

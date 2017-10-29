@@ -28,7 +28,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 
 
 ext {
-    libVersion = '1.0.1'
+    libVersion = '1.0.2'
     libName = 'global-retrofit-converter'
     libUrl = 'https://github.com/ghuiii/GlobalRetrofitConverter'
     desc = "A global retrofit converter which can wrapper other converters"

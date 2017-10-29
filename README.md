@@ -17,8 +17,6 @@ interface Service {
 
     @Json
     @GET("/json") Call<PersonInfo> personInfoFromJson();
-
-    @GET("/json") Call<PersonInfo> personInfoFromJson2();
 }
 ```
 
@@ -28,13 +26,11 @@ Then
 Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(server.url("/"))
                 .addConverterFactory(GlobalConverterFactory.create()
-                        .add(GsonConverterFactory.create(), Json.class) // the default one
+                        .add(GsonConverterFactory.create(), Json.class) 
                         .add(FruitConverterFactory.create(), Html.class))
                 .build();
         service = retrofit.create(Service.class);
 ```
-
-And the first added one (Json) will be the default converter when you didn't add annotation to your retrofit service method.
 
 If you need other converter, you can create the annotation by yourself. For example you need a `xml` converter.
 
