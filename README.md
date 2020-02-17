@@ -42,7 +42,7 @@ public @interface Xml {
 Then add it to the GlobalConverterFactory.
 
 # Who Use?
-* [V2er - A Nice V2EX App.](https://play.google.com/store/apps/details?id=me.ghui.v2er.free)
+* [V2er - A Nice V2EX App.](https://play.google.com/store/apps/details?id=me.ghui.v2er)
 
 # Installation
 
